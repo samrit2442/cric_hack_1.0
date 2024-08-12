@@ -1,18 +1,18 @@
 # Collecting all club competition data ----
 library(pacman)
-pacman::p_load(tidyverse, plyr, reader)
+pacman::p_load(tidyverse, plyr, reader, scales)
 
-unzip("./club_cricket/apl_male_csv2.zip", exdir = paste0("./APL"))
-unzip("./club_cricket/bbl_male_csv2.zip", exdir = paste0("./BBL"))
-unzip("./club_cricket/bpl_male_csv2.zip", exdir = paste0("./BPL"))
-unzip("./club_cricket/cpl_male_csv2.zip", exdir = paste0("./CPL"))
-unzip("./club_cricket/ctc_male_csv2.zip", exdir = paste0("./CTC"))
-unzip("./club_cricket/ipl_male_csv2.zip", exdir = paste0("./IPL"))
-unzip("./club_cricket/lpl_male_csv2.zip", exdir = paste0("./LPL"))
-unzip("./club_cricket/mlc_male_csv2.zip", exdir = paste0("./MLC"))
-unzip("./club_cricket/ntb_male_csv2.zip", exdir = paste0("./NTB"))
-unzip("./club_cricket/psl_male_csv2.zip", exdir = paste0("./PSL"))
-unzip("./club_cricket/sat_male_csv2.zip", exdir = paste0("./SAT"))
+# unzip("./club_cricket/apl_male_csv2.zip", exdir = paste0("./APL"))
+# unzip("./club_cricket/bbl_male_csv2.zip", exdir = paste0("./BBL"))
+# unzip("./club_cricket/bpl_male_csv2.zip", exdir = paste0("./BPL"))
+# unzip("./club_cricket/cpl_male_csv2.zip", exdir = paste0("./CPL"))
+# unzip("./club_cricket/ctc_male_csv2.zip", exdir = paste0("./CTC"))
+# unzip("./club_cricket/ipl_male_csv2.zip", exdir = paste0("./IPL"))
+# unzip("./club_cricket/lpl_male_csv2.zip", exdir = paste0("./LPL"))
+# unzip("./club_cricket/mlc_male_csv2.zip", exdir = paste0("./MLC"))
+# unzip("./club_cricket/ntb_male_csv2.zip", exdir = paste0("./NTB"))
+# unzip("./club_cricket/psl_male_csv2.zip", exdir = paste0("./PSL"))
+# unzip("./club_cricket/sat_male_csv2.zip", exdir = paste0("./SAT"))
 
 apl <- read.csv("./APL/all_matches.csv")
 bbl <- read.csv("./BBL/all_matches.csv")
@@ -26,17 +26,17 @@ ntb <- read.csv("./NTB/all_matches.csv")
 psl <- read.csv("./PSL/all_matches.csv")
 sat <- read.csv("./SAT/all_matches.csv")
 
-common_plyr <- inner_join(distinct(apl, striker),
-                          distinct(bbl, striker)) |> 
-  inner_join(distinct(bpl, striker)) |> 
-  inner_join(distinct(cpl, striker)) |> 
-  inner_join(distinct(ctc, striker)) |> 
-  inner_join(distinct(ipl, striker)) |> 
-  inner_join(distinct(lpl, striker)) |> 
-  inner_join(distinct(mlc, striker)) |> 
-  inner_join(distinct(ntb, striker)) |> 
-  inner_join(distinct(psl, striker)) |> 
-  inner_join(distinct(sat, striker))
+# common_plyr <- inner_join(distinct(apl, striker),
+#                           distinct(bbl, striker)) |> 
+#   inner_join(distinct(bpl, striker)) |> 
+#   inner_join(distinct(cpl, striker)) |> 
+#   inner_join(distinct(ctc, striker)) |> 
+#   inner_join(distinct(ipl, striker)) |> 
+#   inner_join(distinct(lpl, striker)) |> 
+#   inner_join(distinct(mlc, striker)) |> 
+#   inner_join(distinct(ntb, striker)) |> 
+#   inner_join(distinct(psl, striker)) |> 
+#   inner_join(distinct(sat, striker))
 
 # Creating Summary stats of top 15 batters and bowlers of each league ----------
 
@@ -52,27 +52,24 @@ data_clean <- function(dataset) {
   
   df <- dataset |>
     tibble::as_tibble() |> 
-    dplyr::select(-season, -other_wicket_type, -other_player_dismissed) |> 
     dplyr::filter(innings == 1 | innings == 2) |> 
     dplyr::mutate(over = ceiling(ball),
-                  over_type = case_when(
-                    over >= 1 & over <= 6 ~ "Powerplay",
-                    over >= 7 & over <= 16 ~ "Middle Over",
-                    over >= 17 ~ "Death Over",
-                    .default = "over")) |> 
-    dplyr::mutate(isDot = if_else(runs_off_bat == 0, 1, 0),
-                  isFour = if_else(runs_off_bat == 4, 1, 0),
-                  isSix = if_else(runs_off_bat == 6, 1, 0),
                   isOut = if_else(wicket_type != 0, 1, 0),
                   team_runs = runs_off_bat + extras,
-                  year = year(as.Date(start_date)))
+                  year = year(as.Date(start_date))) |> 
+    dplyr::select(match_id, year, striker, batting_team, bowling_team, bowler,
+                  runs_off_bat, over, ball, extras, wides, noballs, byes, 
+                  legbyes, penalty, team_runs, isOut,
+                  wicket_type, player_dismissed)
   return(df)
 }
 
-apl2 <- data_clean(apl)
-bbl2 <- data_clean(bbl)
-ipl2 <- data_clean(ipl)
+master_data <- rbind(apl, bbl, bpl, cpl, ctc, ipl, mlc, ntb, psl, sat)
 
+m_data <- data_clean(master_data)
+
+# m_data$batting_team |> unique() |> sort()
+  
 batter_stat <- function(cleaned_data) {
   df <- cleaned_data |> 
     as_tibble() |> 
@@ -81,7 +78,9 @@ batter_stat <- function(cleaned_data) {
                      runs = sum(runs_off_bat),
                      balls = length(runs_off_bat),
                      runs_per_ing = round(runs/ing_plyd, 2),
-                     strike_rate = round(runs/balls*100, 2))
+                     strike_rate = round(runs/balls*100, 2)) |> 
+    dplyr::ungroup() |> 
+    dplyr::filter(ing_plyd >= 8)
   return(df)
 }
 
@@ -100,12 +99,39 @@ bowler_stat <- function(cleaned_data) {
                      runs_conc = sum(team_runs),
                      wkts = sum(isOut)) |> 
     dplyr::inner_join(df1) |> 
-    dplyr::mutate(eco = round(runs_conc/balls*6, 2))
+    dplyr::mutate(econ = round(runs_conc/balls*6, 2)) |> 
+    dplyr::ungroup() |> 
+    dplyr::filter(ing_plyd >= 8)
 }
 
+m_bat <- batter_stat(m_data)
+m_bowl <- bowler_stat(m_data)
 
-ipl_bat <- batter_stat(ipl2)
-ipl_bowl <- bowler_stat(ipl2)
+
+m_bat_ranked <- m_bat |> 
+  dplyr::group_by(year, batting_team) |> 
+  dplyr::mutate(R = rank(-runs_per_ing),
+                S = rank(-strike_rate),
+                `T` = (R + S)/2,
+                comb_rank = floor(rank(`T`)),
+                norm_score = 1 - rescale(comb_rank),
+                N = length(R)) |> 
+  dplyr::ungroup() |> 
+  dplyr::group_by(striker, year) |> 
+  dplyr::mutate(No_teams = length(batting_team)) |> 
+  dplyr::ungroup() |> 
+  dplyr::filter(No_teams > 1)
+
+m_bat_ranked2 <- m_bat_ranked |> 
+  dplyr::arrange(desc(norm_score), desc(N)) |> 
+  dplyr::group_by(striker, year) |> 
+  dplyr::slice(1)
+
+
+
+
+
+
 
 
 
