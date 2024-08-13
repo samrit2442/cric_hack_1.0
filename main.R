@@ -69,6 +69,17 @@ master_data <- rbind(apl, bbl, bpl, cpl, ctc, ipl, mlc, ntb, psl, sat)
 m_data <- data_clean(master_data)
 
 # m_data$batting_team |> unique() |> sort()
+
+# saveRDS(m_data, "m_data.rds")
+
+################################################################################
+# Run from HERE ----------------------------------------------------------------
+################################################################################
+
+library(pacman)
+pacman::p_load(tidyverse, plyr, reader, scales)
+
+m_data <- readRDS("m_data.rds")
   
 batter_stat <- function(cleaned_data) {
   df <- cleaned_data |> 
@@ -77,8 +88,8 @@ batter_stat <- function(cleaned_data) {
     dplyr::summarise(ing_plyd = n_distinct(match_id),
                      runs = sum(runs_off_bat),
                      balls = length(runs_off_bat),
-                     runs_per_ing = round(runs/ing_plyd, 2),
-                     strike_rate = round(runs/balls*100, 2)) |> 
+                     runs_per_ing = runs/ing_plyd,
+                     strike_rate = runs/balls*100) |> 
     dplyr::ungroup() |> 
     dplyr::filter(ing_plyd >= 8)
   return(df)
@@ -97,7 +108,7 @@ bowler_stat <- function(cleaned_data) {
     dplyr::group_by(bowler, year, bowling_team) |> 
     dplyr::summarise(ing_plyd = n_distinct(match_id),
                      runs_conc = sum(team_runs),
-                     wkts = sum(isOut)) |> 
+                     wkts_per_ing = sum(isOut)/ing_plyd) |> 
     dplyr::inner_join(df1) |> 
     dplyr::mutate(econ = round(runs_conc/balls*6, 2)) |> 
     dplyr::ungroup() |> 
