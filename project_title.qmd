@@ -1,0 +1,63 @@
+---
+title: "Quantifying Player Value Across Multiple T20 Teams: A Comprehensive Analytical Framework"
+author: 
+  - name: Samrit Pramanik
+    email: samrit.2442@gmail.com
+  - name: Sumit Kumar Pal
+    email: palsumitkumar1997@gmail.com
+format: pdf
+---
+
+## Abstract
+
+Imagine a global Champions League for cricket, where clubs from around the world compete, and players represent these teams based solely on their skills and connections, regardless of their national teams or salary considerations.
+
+## Introduction
+
+In the rapidly evolving world of T20 cricket, player performance analytics has become essential for understanding and maximizing team value. Our research aims to determine the team for which a player has generated the most value when participating in multiple T20 leagues within a calendar year. By focusing on key performance indicators, we provide a robust framework that quantifies the contribution of batters and bowlers, ensuring a fair comparison across different teams and tournaments.
+
+### Methodology Overview
+
+To maintain the integrity and relevance of our analysis, we imposed a minimum eligibility criterion: a player must have participated in **at least eight matches** for a team within a given tournament in a year. This threshold ensures that only players who have made a substantial impact are considered in our value determination process.
+
+#### Batter's Value Assessment
+
+For batters, we identified two primary metrics as indicators of performance: the average number of runs scored per innings and the strike rate. These metrics were chosen because they encapsulate both consistency and impact, which are crucial in T20 cricket.
+
+-   **Ranking Process:** Each batter was ranked within their team based on their average runs per innings and strike rate. The ranks from these two metrics were then combined, with equal weightage given to both. This combined rank offers a holistic view of the player's performance relative to their teammates.
+
+-   **Scaling and Scoring:** The combined rank was scaled to a range of 0 to 1, where 0 represents the top-performing player and 1 the lowest. We then computed an importance score for the player by calculating $1- \text{scaled rank}$. This score reflects the player’s relative importance to their team in the tournament, with higher scores indicating greater value.
+
+-   **Resolving Ties:** In cases where two or more players had identical importance scores, the tie was resolved by considering the number of batters included in the combined ranking. This approach acknowledges the context of the team’s batting lineup, giving preference to performance in a larger pool of players.
+
+### Some of the derived list of batters
+
+| Batter      | Year | Derived Team                | Teams                                                                     |
+|--------------|--------------|------------------|--------------------------|
+| DA Miller   | 2023 | Paarl Royals                | Gujarat Titans, Paarl Royals                                              |
+| TH David    | 2022 | Hobart Hurricanes           | Lancashire, Hobart Hurricanes, Multan Sultans, Mumbai Indians             |
+| GJ Maxwell  | 2021 | Royal Challengers Bangalore | Melbourne Stars, Royal Challengers Bangalore                              |
+| CA Lynn     | 2020 | Lahore Qalandars            | Brisbane Heat, Lahore Qalandars, St. Kitts and Nevis Patrios              |
+| Babar Azam  | 2019 | Someset                     | Karachi Kings, Someset                                                    |
+| BB McCullum | 2018 | Trinbago Knight Riders      | Brisbane Heat, Kandahar Knights, Lahore Qalandars, Trinbago Knight Riders |
+
+#### Bowler's Value Assessment
+
+-   **Ranking Process:** We selected the economy rate, which reflects a bowler's ability to contain runs, and the average number of wickets taken per innings, which highlights their ability to make breakthroughs.
+
+-   We followed the same steps as for batters and derived the team in which the bowler should be played for in that particular year.
+
+### Some of the derived list of bowlers
+
+| Bowler      | Year | Derived Team           | Teams                                                   |
+|---------------|---------------|----------------|---------------------------|
+| A Nortje    | 2023 | Pretoria Capitals      | Delhi Capitals, Pretoria Capitals                       |
+| AS Joseph   | 2022 | St Lucia Kings         | Gujarat Titans, St Lucia Kings                          |
+| Imad Wasim  | 2021 | Melbourne Renegades    | Karachi Kings, Melbourne Renegades                      |
+| Fawad Ahmed | 2020 | Trinbago Knight Riders | Perth Scorchers, Trinbago Knight Riders                 |
+| AD Russell  | 2019 | Rajshahi Royals        | Dhaka Dynamites, Kolkata Knight Riders, Rajshahi Royals |
+| A Zampa     | 2018 | Essex                  | Essex, Jamaica Tallawahs                                |
+
+## Conclusion
+
+Through this systematic approach, we have developed a comprehensive framework that quantifies the value a player generates for each team they represent in a calendar year. By integrating key performance metrics and addressing ties with contextual awareness, our methodology ensures that the true impact of a player is accurately captured. This analysis not only aids teams in understanding the contributions of their players but also provides valuable insights for player retention and acquisition strategies in the competitive world of T20 cricket.
